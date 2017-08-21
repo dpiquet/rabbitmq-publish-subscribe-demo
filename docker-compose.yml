@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+    engine:
+        build: ./docker/engine/
+        volumes:
+            - .:/home/docker:rw
+            - ./docker/engine/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+        working_dir: /home/docker
+        networks:
+            - default
+        dns_search:
+            - engine
+
+    db:
+        image: postgres
+        ports:
+            - 3306
+        environment:
+            - POSTGRES_PASSWORD=dev
+            - POSTGRES_USER=dev
+            - POSTGRES_DB=dev
+        volumes:
+            - db:/var/lib/mysql:rw
+        networks:
+            - default
+        dns_search:
+            - db
+volumes:
+    db: {}
+
+networks:
+    default: {}

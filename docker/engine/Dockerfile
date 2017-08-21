@@ -28,6 +28,7 @@ RUN apt-get update \
         zip \
         pdo \
         pdo_pgsql \
+        bcmath \
     && docker-php-source delete \
     && php -r "readfile('https://getcomposer.org/installer');" | php -- --install-dir=/usr/local/bin --filename=composer \
     && chmod +x /usr/local/bin/composer \

@@ -34,6 +34,8 @@ class RabbitMqProducerCommand extends Command {
 
 	protected $exchange;
 
+	protected $msg_delay;
+
 	public function __construct() {
 		$this->rabbitmq_host = 'rabbitmq';
 		$this->rabbitmq_port = 5672;
@@ -41,6 +43,7 @@ class RabbitMqProducerCommand extends Command {
 		$this->rabbitmq_password = 'guest';
 		$this->exchange = 'demo-exchange';
 		
+		$this->msg_delay = 1;
 		
 		parent::__construct();
 	}
@@ -94,7 +97,7 @@ class RabbitMqProducerCommand extends Command {
 			$message = new AMQPMessage($msg_body, array('content_type' => 'text/plain'));
 			$producer_channel->basic_publish($message, $this->exchange);
 			$producer_channel->wait_for_pending_acks();
-			sleep(10);
+			sleep($this->msg_delay);
 		}
 		
 		$producer_channel->close();

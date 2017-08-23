@@ -63,10 +63,14 @@ class RabbitMqConsumerCommand extends Command {
 		// publish confirm mode
 		$consumer_channel->confirm_select();
 		
-		// TODO: see https://github.com/php-amqplib/php-amqplib/blob/master/demo/amqp_publisher_with_confirms.php
 		
-		$consummer_connection = new AMQPStreamConnection($this->rabbitmq_host, $this->rabbitmq_port, $this->rabbitmq_user, $this->rabbitmq_password);
-		$consumer_channel = $consumer_connection->channel();
+		$consumer_channel->exchange_declare(
+			$this->exchange, //exchange
+			'fanout', //type
+			false,  //passive (don't check if exchange with same name already exists)
+			true, //durable (survive service restarts)
+			false //autodelete delete channel when channel closed
+		);
 		
 		// Declare queue (creates if not exists)
 		$consumer_channel->queue_declare(
@@ -82,15 +86,15 @@ class RabbitMqConsumerCommand extends Command {
 		
 		$output->writeln(sprintf('[consumer %s] ready to process messages', $this->queue_name));
 		
-		$callback = function(AMQPMessage $msg) use ($output) {
-			$output->writeln(sprintf('[consumer %s] got message %s', $this->queue_name, $msg->body));
-		};
-		
-		$consumer_channel->basic_consume($this->queue_name, '', false, true, false, false, $callback);
-		
-		while(count($consumer_channel->callbacks)) {
-			$consumer_channel->wait();
+		// Consume all messages in queue
+		while($msg_recv = $consumer_channel->basic_get($this->queue_name)) {
+			$output->writeln(sprintf('got message %s !', $msg_recv->body));
+			
+			// ack message
+			$consumer_channel->basic_ack($msg_recv->delivery_info['delivery_tag']);
 		}
+		
+		$output->writeln('quit !');
 		
 		$consumer_channel->close();
 		$consumer_connection->close();

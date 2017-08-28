@@ -19,7 +19,7 @@ use PhpAmqpLib\Message\AMQPMessage;
  */
 
 
-class RabbitMqConsumerCommand extends Command {
+class FanoutConsumerCommand extends Command {
 
 	protected $rabbitmq_host;
 
@@ -46,7 +46,7 @@ class RabbitMqConsumerCommand extends Command {
 
 	protected function configure() {
 		$this
-			->setName('rabbitmq-consumer')
+			->setName('fanout-consumer')
 			->addArgument('queue_name', InputArgument::REQUIRED, 'queue name')
 		;
 	}
@@ -63,7 +63,7 @@ class RabbitMqConsumerCommand extends Command {
 		// publish confirm mode
 		$consumer_channel->confirm_select();
 		
-		
+		// Declare exchange (just in case consumer is called before producer)
 		$consumer_channel->exchange_declare(
 			$this->exchange, //exchange
 			'fanout', //type

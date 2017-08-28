@@ -22,7 +22,7 @@ use PhpAmqpLib\Message\AMQPMessage;
  */
 
 
-class RabbitMqProducerCommand extends Command {
+class FanoutProducerCommand extends Command {
 
 	protected $rabbitmq_host;
 
@@ -50,7 +50,7 @@ class RabbitMqProducerCommand extends Command {
 
 
 	protected function configure() {
-		$this->setName('rabbitmq-producer');
+		$this->setName('fanout-producer');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
